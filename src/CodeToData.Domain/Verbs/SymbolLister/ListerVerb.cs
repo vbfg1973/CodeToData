@@ -42,7 +42,7 @@ public class ListerVerb
 
         if (options.NamespaceFilter != null)
             symbols = symbols
-                .Where(x => x.Namespace.Contains(options.NamespaceFilter, StringComparison.InvariantCultureIgnoreCase))
+                .Where(x => x.ContainingNamespace.Contains(options.NamespaceFilter, StringComparison.InvariantCultureIgnoreCase))
                 .ToHashSet();
 
         await Utilities.SaveCsvAsync(options.OutputCsv, symbols);

@@ -42,7 +42,7 @@ public class FinderVerb
 
         if (options.NamespaceFilter != null)
             symbols = symbols
-                .Where(x => x.Namespace.Contains(options.NamespaceFilter, StringComparison.InvariantCultureIgnoreCase))
+                .Where(x => x.ContainingNamespace.Contains(options.NamespaceFilter, StringComparison.InvariantCultureIgnoreCase))
                 .ToHashSet();
 
         var output = new List<dynamic>();
@@ -56,7 +56,7 @@ public class FinderVerb
                 from location in reference.Locations
                 select new
                 {
-                    SymbolName = symbol.Name,
+                    SymbolName = symbol.SymbolName,
                     ContainingAssembly = symbol.Symbol().ContainingAssembly.Name,
                     ContainingNamespace = symbol.Symbol().ContainingNamespace.ToDisplayString(),
                     Project = location.Document.Project.Name,
