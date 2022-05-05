@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
-using CodeToData.Domain.Verbs.SymbolFinder;
-using CodeToData.Domain.Verbs.SymbolLister;
+using CodeToData.Domain.Verbs.TypeReferences;
 using CommandLine;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -38,8 +37,8 @@ internal static class Program
         #region Verbs
 
         s_serviceCollection
-            .AddTransient<ListerVerb>()
-            .AddTransient<FinderVerb>();
+            .AddTransient<TypeReferencesVerb>()
+            ;
 
         #endregion
 
@@ -75,24 +74,11 @@ internal static class Program
         ConfigureServices();
 
         Parser.Default
-            .ParseArguments<ListerOptions, FinderOptions>(args)
-            .WithParsed<ListerOptions>(options =>
+            .ParseArguments<TypeReferencesOptions>(args)
+            .WithParsed<TypeReferencesOptions>(options =>
             {
-                var verb = s_serviceProvider.GetService<ListerVerb>();
-                verb?.Run(options).Wait();
-            })
-            .WithParsed<FinderOptions>(options =>
-            {
-                var verb = s_serviceProvider.GetService<FinderVerb>();
+                var verb = s_serviceProvider.GetService<TypeReferencesVerb>();
                 verb?.Run(options).Wait();
             });
-
-        // var codeAnalyser = new CodeAnalyser(path);
-        // await codeAnalyser.ListReferences();
-
-        // await codeAnalyser.SaveMetas();
-
-        // await codeAnalyser.SaveAllAvailableSymbols();
-        // await codeAnalyser.SaveFoundSymbols();
     }
 }

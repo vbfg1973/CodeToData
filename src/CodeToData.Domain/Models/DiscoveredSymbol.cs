@@ -13,10 +13,10 @@ public class DiscoveredSymbol : IEquatable<DiscoveredSymbol>
     public string SymbolName => _symbol.Name;
     public string ContainingAssembly => _symbol.ContainingAssembly.Name;
     public string ContainingNamespace => _symbol.ContainingNamespace.ToDisplayString();
-    public string TypeKind => _symbol.TypeKind.ToString(); 
+    public string TypeKind => _symbol.TypeKind.ToString();
     private INamedTypeSymbol _symbol { get; }
 
-    
+
     public bool Equals(DiscoveredSymbol other)
     {
         if (ReferenceEquals(null, other)) return false;

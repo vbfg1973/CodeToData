@@ -38,6 +38,16 @@ public class SolutionCompilerService
     public IEnumerable<Compilation> Compilations => _compilations.Values;
     public IEnumerable<Document> Documents => Projects.SelectMany(project => project.Documents);
 
+    public Compilation GetCompilation(string projectName)
+    {
+        return _compilations[projectName];
+    }
+
+    public IEnumerable<Document> GetDocuments(string projectName)
+    {
+        return _projects[projectName].Documents;
+    }
+
     private async Task BuildIt()
     {
         foreach (var project in Solution.Projects)
