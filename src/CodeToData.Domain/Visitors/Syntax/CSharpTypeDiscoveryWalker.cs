@@ -59,13 +59,59 @@ public class TypeDiscoveryWalker : CSharpSyntaxWalker
             EndPosition = node.Span.End
         };
     }
+    
+    private IEnumerable<DiscoveredType> DiscoveredType(SyntaxNode node)
+    {
+        var symbolInfo = _model.GetSymbolInfo(node);
+        var identifiedType = _model.GetTypeInfo(node);
+        var convertedType = identifiedType.ConvertedType;
+
+        if (convertedType is not { SpecialType: SpecialType.None }) yield break;
+        string assembly = string.Empty;
+        string ns = string.Empty;
+
+        try
+        {
+            assembly = GetAssembly(symbolInfo.Symbol);
+            ns = GetNameSpace(symbolInfo.Symbol);
+        }
+
+        catch
+        {
+            //
+        }
+
+        if (string.IsNullOrEmpty(assembly) || string.IsNullOrEmpty(ns)) yield break;
+
+        yield return new DiscoveredType
+        {
+            Name = convertedType.Name,
+            SourceAssembly = assembly,
+            SourceNamespace = ns,
+            TypeKind = convertedType.TypeKind.ToString(),
+            DocumentName = _document.FilePath,
+            AssemblyName = _document.Project.AssemblyName,
+            StartPosition = node.Span.Start,
+            EndPosition = node.Span.End
+        };
+    }
 
     private string GetNameSpace(ITypeSymbol typeSymbol)
     {
         return typeSymbol.ContainingNamespace != null ? typeSymbol.ContainingNamespace.ToDisplayString() : string.Empty;
     }
+    
+    private string GetNameSpace(ISymbol typeSymbol)
+    {
+        return typeSymbol.ContainingNamespace != null ? typeSymbol.ContainingNamespace.ToDisplayString() : string.Empty;
+    }
 
     private string GetAssembly(ITypeSymbol typeSymbol)
+    {
+        return typeSymbol.ContainingAssembly != null ? typeSymbol.ContainingAssembly.Name : string.Empty;
+    }
+    
+    private string GetAssembly(ISymbol typeSymbol)
     {
         return typeSymbol.ContainingAssembly != null ? typeSymbol.ContainingAssembly.Name : string.Empty;
     }
