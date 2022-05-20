@@ -11,8 +11,8 @@ public static class Utilities
 {
     public static async Task SaveCsvAsync<T>(string path, IEnumerable<T> items)
     {
-        await using var writer = new StreamWriter(path);
-        await using var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
+        await using StreamWriter writer = new(path);
+        await using CsvWriter csv = new(writer, CultureInfo.InvariantCulture);
         await csv.WriteRecordsAsync(items);
     }
 
@@ -20,9 +20,9 @@ public static class Utilities
     {
         return await Task.Run(() =>
         {
-            using var writer = new StreamReader(path);
-            using var csv = new CsvReader(writer, CultureInfo.InvariantCulture);
-            var list = csv.GetRecords<T>().ToList();
+            using StreamReader writer = new(path);
+            using CsvReader csv = new(writer, CultureInfo.InvariantCulture);
+            List<T> list = csv.GetRecords<T>().ToList();
             return list;
         });
     }
