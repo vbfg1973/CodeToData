@@ -5,6 +5,7 @@ using CodeToData.Domain.Extensions;
 using CodeToData.Domain.Models;
 using CodeToData.Domain.Services.CodeAnalysis;
 using CodeToData.Domain.Visitors.Syntax;
+using Microsoft.CodeAnalysis;
 using Microsoft.Extensions.Logging;
 
 namespace CodeToData.Domain.Verbs.TypeReferences;
@@ -24,21 +25,32 @@ public class TypeReferencesVerb
     {
         await Console.Error.WriteLineAsync(
             $"Compiling {options.Solution}");
-        var compiler = new SolutionCompilerService(options.Solution);
+        SolutionCompilerService compiler = new SolutionCompilerService(options.Solution);
 
-        var types = new List<DiscoveredType>();
+        List<DiscoveredType> types = new List<DiscoveredType>();
 
-        foreach (var project in compiler.Projects)
+        foreach (Project project in compiler.Projects)
         {
-            var projectCompilation = compiler.GetCompilation(project.Name);
-            var docs = compiler.GetDocuments(project.Name);
+            Compilation projectCompilation = compiler.GetCompilation(project.Name);
+            IEnumerable<Document> docs = compiler.GetDocuments(project.Name);
 
-            foreach (var doc in docs)
-            {
-                var walker = new TypeDiscoveryWalker(projectCompilation, doc);
+            await Console.Error.WriteLineAsync($"Examining {project.Name} - {projectCompilation.Language}");
+            
+            foreach (Document doc in docs)
+                switch (projectCompilation.Language)
+                {
+                    case "C#":
+                        CSharpTypeDiscoveryWalker csharpwalker = new(projectCompilation, doc);
+                        types.AddRange(FilterDiscoveredTypes(csharpwalker.Types, options));
+                        break;
 
-                types.AddRange(FilterDiscoveredTypes(walker.Types, options));
-            }
+                    case "Visual Basic":
+                        VisualBasicTypeDiscoveryWalker vbwalker = new(projectCompilation, doc);
+                        types.AddRange(FilterDiscoveredTypes(vbwalker.Types, options));
+                        break;
+                    
+                    default: throw new ArgumentException("Unknown language");
+                }
         }
 
         await Utilities.SaveCsvAsync(options.OutputCsv, types);
@@ -53,15 +65,11 @@ public class TypeReferencesVerb
         if (!string.IsNullOrEmpty(options.SourceNamespaceFilter))
             types = types.FilterBySourceNamespace(options.SourceNamespaceFilter, options.CaseInsensitive);
 
-        if (!options.GlobalNamespace)
-        {
-            types = types.InvertFilterBySourceNamespace("global namespace");
-        }
+        if (!options.GlobalNamespace) types = types.InvertFilterBySourceNamespace("global namespace");
 
-        if (!options.MSCorlib)
-        {
-            types = types.InvertFilterBySourceAssembly("mscorlib");
-        }
+        if (!options.MSCorlib) types = types.InvertFilterBySourceAssembly("mscorlib");
+        
+        if (!options.MSCorlib) types = types.InvertFilterBySourceAssembly("netstandard");
 
         return types;
     }

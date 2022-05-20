@@ -7,13 +7,13 @@ using Microsoft.CodeAnalysis.VisualBasic;
 
 namespace CodeToData.Domain.Visitors.Syntax;
 
-public class VBTypeDiscoveryWalker : VisualBasicSyntaxWalker
+public class VisualBasicTypeDiscoveryWalker : VisualBasicSyntaxWalker
 {
     private readonly Document _document;
     private readonly SemanticModel _model;
     private readonly SyntaxTree _tree;
 
-    public VBTypeDiscoveryWalker(Compilation compilation, Document document)
+    public VisualBasicTypeDiscoveryWalker(Compilation compilation, Document document)
     {
         _document = document;
         _tree = document.GetSyntaxTreeAsync().Result;

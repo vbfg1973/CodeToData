@@ -21,4 +21,7 @@ public class TypeReferencesOptions : BaseSolutionOptions
     
     [Option('m', "mscorlib", Default = false, HelpText = "Ignores types from mscorlib assembly (Guids, IEnumerable, et al) unless turned on")]
     public bool MSCorlib { get; set; }
+    
+    [Option('n', "netstandard", Default = false, HelpText = "Ignores types from netstandard assembly")]
+    public bool NetStandard { get; set; }
 }

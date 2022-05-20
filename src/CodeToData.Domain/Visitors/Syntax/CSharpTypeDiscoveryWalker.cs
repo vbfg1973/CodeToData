@@ -6,13 +6,13 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace CodeToData.Domain.Visitors.Syntax;
 
-public class TypeDiscoveryWalker : CSharpSyntaxWalker
+public class CSharpTypeDiscoveryWalker : CSharpSyntaxWalker
 {
     private readonly Document _document;
     private readonly SemanticModel _model;
     private readonly SyntaxTree _tree;
 
-    public TypeDiscoveryWalker(Compilation compilation, Document document)
+    public CSharpTypeDiscoveryWalker(Compilation compilation, Document document)
     {
         _document = document;
         _tree = document.GetSyntaxTreeAsync().Result;
