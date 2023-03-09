@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using CodeToData.Domain.Verbs.Definitions;
 using CodeToData.Domain.Verbs.TypeReferences;
 using CommandLine;
 using Microsoft.Extensions.Configuration;
@@ -38,6 +39,7 @@ internal static class Program
 
         s_serviceCollection
             .AddTransient<TypeReferencesVerb>()
+            .AddTransient<DefinitionsVerb>()
             ;
 
         #endregion
@@ -74,11 +76,17 @@ internal static class Program
         ConfigureServices();
 
         Parser.Default
-            .ParseArguments<TypeReferencesOptions>(args)
+            .ParseArguments<DefinitionsOptions, TypeReferencesOptions>(args)
             .WithParsed<TypeReferencesOptions>(options =>
             {
                 var verb = s_serviceProvider.GetService<TypeReferencesVerb>();
                 verb?.Run(options).Wait();
-            });
+            })
+            .WithParsed<DefinitionsOptions>(options =>
+            {
+                var verb = s_serviceProvider.GetService<DefinitionsVerb>();
+                verb?.Run(options).Wait();
+            })
+            ;
     }
 }
