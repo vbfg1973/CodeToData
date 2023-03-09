@@ -5,25 +5,26 @@ using System.Linq;
 using System.Threading.Tasks;
 using CsvHelper;
 
-namespace CodeToData.Domain;
-
-public static class Utilities
+namespace CodeToData.Domain
 {
-    public static async Task SaveCsvAsync<T>(string path, IEnumerable<T> items)
+    public static class Utilities
     {
-        await using StreamWriter writer = new(path);
-        await using CsvWriter csv = new(writer, CultureInfo.InvariantCulture);
-        await csv.WriteRecordsAsync(items);
-    }
-
-    public static async Task<IEnumerable<T>> ReadCsvAsync<T>(string path)
-    {
-        return await Task.Run(() =>
+        public static async Task SaveCsvAsync<T>(string path, IEnumerable<T> items)
         {
-            using StreamReader writer = new(path);
-            using CsvReader csv = new(writer, CultureInfo.InvariantCulture);
-            List<T> list = csv.GetRecords<T>().ToList();
-            return list;
-        });
+            await using StreamWriter writer = new(path);
+            await using CsvWriter csv = new(writer, CultureInfo.InvariantCulture);
+            await csv.WriteRecordsAsync(items);
+        }
+
+        public static async Task<IEnumerable<T>> ReadCsvAsync<T>(string path)
+        {
+            return await Task.Run(() =>
+            {
+                using StreamReader writer = new(path);
+                using CsvReader csv = new(writer, CultureInfo.InvariantCulture);
+                var list = csv.GetRecords<T>().ToList();
+                return list;
+            });
+        }
     }
 }

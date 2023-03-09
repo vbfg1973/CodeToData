@@ -1,7 +1,9 @@
-﻿namespace CodeToData.Domain.Verbs.Definitions
+﻿using CommandLine;
+
+namespace CodeToData.Domain.Verbs.Definitions
 {
-    public class DefinitionsOptions
+    [Verb("definitions", HelpText = "")]
+    public sealed class DefinitionsOptions : BaseSolutionOptions
     {
-        
     }
 }

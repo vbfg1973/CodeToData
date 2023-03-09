@@ -7,64 +7,70 @@ using Microsoft.Build.Locator;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.MSBuild;
 
-namespace CodeToData.Domain.Services.CodeAnalysis;
-
-public class SolutionCompilerService
+namespace CodeToData.Domain.Services.CodeAnalysis
 {
-    private readonly Dictionary<string, Compilation> _compilations = new();
-    private readonly Dictionary<string, Project> _projects = new();
-    private readonly Dictionary<string, INamedTypeSymbol> _symbols = new();
-
-    public SolutionCompilerService(string solutionPath)
+    public class SolutionCompilerService
     {
-        SolutionPath = solutionPath;
+        private readonly Dictionary<string, Compilation> _compilations = new();
+        private readonly Dictionary<string, Project> _projects = new();
+        private readonly Dictionary<string, INamedTypeSymbol> _symbols = new();
 
-        MSBuildLocator.RegisterDefaults();
-        using var workspace = MSBuildWorkspace.Create();
-        workspace.WorkspaceFailed += (o, e) =>
+        public SolutionCompilerService(string solutionPath)
         {
-            Console.Error.WriteLine($"MSBuild {e.Diagnostic.Kind}: {e.Diagnostic.Message}");
-            Console.Error.WriteLine();
-        };
+            SolutionPath = solutionPath;
 
-        Solution = workspace.OpenSolutionAsync(SolutionPath).Result;
-        BuildIt().Wait();
-    }
+            MSBuildLocator.RegisterDefaults();
+            using var workspace = MSBuildWorkspace.Create();
+            workspace.WorkspaceFailed += (o, e) =>
+            {
+                Console.Error.WriteLine($"MSBuild {e.Diagnostic.Kind}: {e.Diagnostic.Message}");
+                Console.Error.WriteLine();
+            };
 
-    public string SolutionPath { get; }
+            Solution = workspace.OpenSolutionAsync(SolutionPath).Result;
+            BuildIt().Wait();
+        }
 
-    public Solution Solution { get; }
-    public IEnumerable<Project> Projects => _projects.Values;
-    public IEnumerable<Compilation> Compilations => _compilations.Values;
-    public IEnumerable<Document> Documents => Projects.SelectMany(project => project.Documents);
+        public string SolutionPath { get; }
 
-    public Compilation GetCompilation(string projectName)
-    {
-        return _compilations[projectName];
-    }
+        public Solution Solution { get; }
+        public IEnumerable<Project> Projects => _projects.Values;
+        public IEnumerable<Compilation> Compilations => _compilations.Values;
+        public IEnumerable<Document> Documents => Projects.SelectMany(project => project.Documents);
 
-    public IEnumerable<Document> GetDocuments(string projectName)
-    {
-        return _projects[projectName].Documents;
-    }
-
-    private async Task BuildIt()
-    {
-        foreach (var project in Solution.Projects)
+        public Compilation GetCompilation(string projectName)
         {
-            await Console.Error.WriteLineAsync($"Building: {project.Name}");
-            var compilation = await project.GetCompilationAsync();
+            return _compilations[projectName];
+        }
 
-            if (compilation == null) continue;
+        public IEnumerable<Document> GetDocuments(string projectName)
+        {
+            return _projects[projectName].Documents;
+        }
 
-            var symbolWalker = new NamedTypeDiscoveryVisitor();
-            symbolWalker.Visit(compilation.GlobalNamespace);
+        private async Task BuildIt()
+        {
+            foreach (var project in Solution.Projects)
+            {
+                await Console.Error.WriteLineAsync($"Building: {project.Name}");
+                var compilation = await project.GetCompilationAsync();
 
-            foreach (var symbol in symbolWalker.Symbols)
-                _symbols[$"{symbol.ContainingAssembly.Name}_{symbol.Name}"] = symbol;
+                if (compilation == null)
+                {
+                    continue;
+                }
 
-            _compilations[project.Name] = compilation;
-            _projects[project.Name] = project;
+                var symbolWalker = new NamedTypeDiscoveryVisitor();
+                symbolWalker.Visit(compilation.GlobalNamespace);
+
+                foreach (var symbol in symbolWalker.Symbols)
+                {
+                    _symbols[$"{symbol.ContainingAssembly.Name}_{symbol.Name}"] = symbol;
+                }
+
+                _compilations[project.Name] = compilation;
+                _projects[project.Name] = project;
+            }
         }
     }
 }

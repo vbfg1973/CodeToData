@@ -78,7 +78,6 @@ namespace CodeToData.Domain.Verbs.Definitions
             {
                 var ns = cls.Ancestors().OfType<NamespaceStatementSyntax>().FirstOrDefault();
                 var nspace = ns == null ? "Unknown" : ns.Name.ToString();
-                Console.WriteLine($"{doc.FilePath} {cls.Identifier} {nspace}");
 
                 td.Add(new TypeDefinition(doc.FilePath, nspace, cls.Identifier.ToString()));
             }

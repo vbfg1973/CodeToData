@@ -2,17 +2,16 @@
 using CodeToData.Domain.Models;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace CodeToData.Domain.Visitors.Syntax
 {
-    public class CSharpTypeDiscoveryWalker : CSharpSyntaxWalker
+    public class CSharpTypeReferenceDiscoveryWalker : CSharpSyntaxWalker
     {
         private readonly Document _document;
         private readonly SemanticModel _model;
         private readonly SyntaxTree _tree;
 
-        public CSharpTypeDiscoveryWalker(Compilation compilation, Document document)
+        public CSharpTypeReferenceDiscoveryWalker(Compilation compilation, Document document)
         {
             _document = document;
             _tree = document.GetSyntaxTreeAsync().Result;
@@ -40,12 +39,18 @@ namespace CodeToData.Domain.Visitors.Syntax
             var identifiedType = _model.GetTypeInfo(node);
             var convertedType = identifiedType.ConvertedType;
 
-            if (convertedType is not { SpecialType: SpecialType.None }) yield break;
+            if (convertedType is not { SpecialType: SpecialType.None })
+            {
+                yield break;
+            }
 
             var assembly = GetAssembly(convertedType);
             var ns = GetNameSpace(convertedType);
 
-            if (string.IsNullOrEmpty(assembly) || string.IsNullOrEmpty(ns)) yield break;
+            if (string.IsNullOrEmpty(assembly) || string.IsNullOrEmpty(ns))
+            {
+                yield break;
+            }
 
             yield return new DiscoveredType
             {
@@ -59,16 +64,20 @@ namespace CodeToData.Domain.Visitors.Syntax
                 EndPosition = node.Span.End
             };
         }
-    
+
         private IEnumerable<DiscoveredType> DiscoveredType(SyntaxNode node)
         {
             var symbolInfo = _model.GetSymbolInfo(node);
             var identifiedType = _model.GetTypeInfo(node);
             var convertedType = identifiedType.ConvertedType;
 
-            if (convertedType is not { SpecialType: SpecialType.None }) yield break;
-            string assembly = string.Empty;
-            string ns = string.Empty;
+            if (convertedType is not { SpecialType: SpecialType.None })
+            {
+                yield break;
+            }
+
+            var assembly = string.Empty;
+            var ns = string.Empty;
 
             try
             {
@@ -81,7 +90,10 @@ namespace CodeToData.Domain.Visitors.Syntax
                 //
             }
 
-            if (string.IsNullOrEmpty(assembly) || string.IsNullOrEmpty(ns)) yield break;
+            if (string.IsNullOrEmpty(assembly) || string.IsNullOrEmpty(ns))
+            {
+                yield break;
+            }
 
             yield return new DiscoveredType
             {
@@ -100,7 +112,7 @@ namespace CodeToData.Domain.Visitors.Syntax
         {
             return typeSymbol.ContainingNamespace != null ? typeSymbol.ContainingNamespace.ToDisplayString() : string.Empty;
         }
-    
+
         private string GetNameSpace(ISymbol typeSymbol)
         {
             return typeSymbol.ContainingNamespace != null ? typeSymbol.ContainingNamespace.ToDisplayString() : string.Empty;
@@ -110,7 +122,7 @@ namespace CodeToData.Domain.Visitors.Syntax
         {
             return typeSymbol.ContainingAssembly != null ? typeSymbol.ContainingAssembly.Name : string.Empty;
         }
-    
+
         private string GetAssembly(ISymbol typeSymbol)
         {
             return typeSymbol.ContainingAssembly != null ? typeSymbol.ContainingAssembly.Name : string.Empty;

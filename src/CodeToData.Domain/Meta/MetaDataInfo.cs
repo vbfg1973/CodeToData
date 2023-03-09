@@ -1,15 +1,16 @@
 ﻿using Microsoft.CodeAnalysis;
 
-namespace CodeToData.Domain.Meta;
-
-public class MetaDataInfo
+namespace CodeToData.Domain.Meta
 {
-    public MetaDataInfo(ISymbol found, ISymbol foundIn)
+    public class MetaDataInfo
     {
-        Found = found;
-        FoundIn = foundIn;
-    }
+        public MetaDataInfo(ISymbol found, ISymbol foundIn)
+        {
+            Found = found;
+            FoundIn = foundIn;
+        }
 
-    public ISymbol Found { get; set; }
-    public ISymbol FoundIn { get; set; }
+        public ISymbol Found { get; set; }
+        public ISymbol FoundIn { get; set; }
+    }
 }
