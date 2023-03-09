@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using CodeToData.Domain.Verbs.Definitions;
+using CodeToData.Domain.Verbs.Repetition;
 using CodeToData.Domain.Verbs.TypeReferences;
 using CommandLine;
 using Microsoft.Extensions.Configuration;
@@ -40,6 +41,7 @@ internal static class Program
         s_serviceCollection
             .AddTransient<TypeReferencesVerb>()
             .AddTransient<DefinitionsVerb>()
+            .AddTransient<RepetitionVerb>()
             ;
 
         #endregion
@@ -76,7 +78,7 @@ internal static class Program
         ConfigureServices();
 
         Parser.Default
-            .ParseArguments<DefinitionsOptions, TypeReferencesOptions>(args)
+            .ParseArguments<DefinitionsOptions, TypeReferencesOptions, RepetitionOptions>(args)
             .WithParsed<TypeReferencesOptions>(options =>
             {
                 var verb = s_serviceProvider.GetService<TypeReferencesVerb>();
@@ -85,6 +87,11 @@ internal static class Program
             .WithParsed<DefinitionsOptions>(options =>
             {
                 var verb = s_serviceProvider.GetService<DefinitionsVerb>();
+                verb?.Run(options).Wait();
+            })
+            .WithParsed<RepetitionOptions>(options =>
+            {
+                var verb = s_serviceProvider.GetService<RepetitionVerb>();
                 verb?.Run(options).Wait();
             })
             ;
