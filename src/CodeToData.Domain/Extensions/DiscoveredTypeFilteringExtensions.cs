@@ -7,7 +7,8 @@ namespace CodeToData.Domain.Extensions
 {
     public static class DiscoveredTypeFilteringExtensions
     {
-        public static IEnumerable<DiscoveredType> FilterBySourceNamespace(this IEnumerable<DiscoveredType> discoveredTypes,
+        public static IEnumerable<DiscoveredType> FilterBySourceNamespace(
+            this IEnumerable<DiscoveredType> discoveredTypes,
             string filter, bool caseInsensitive = true)
         {
             return discoveredTypes
@@ -15,7 +16,8 @@ namespace CodeToData.Domain.Extensions
                     discoveredType.SourceNamespace.Contains(filter, ComparisonType(caseInsensitive)));
         }
 
-        public static IEnumerable<DiscoveredType> FilterBySourceAssembly(this IEnumerable<DiscoveredType> discoveredTypes,
+        public static IEnumerable<DiscoveredType> FilterBySourceAssembly(
+            this IEnumerable<DiscoveredType> discoveredTypes,
             string filter, bool caseInsensitive = true)
         {
             return discoveredTypes
@@ -23,7 +25,8 @@ namespace CodeToData.Domain.Extensions
                     discoveredType.SourceAssembly.Contains(filter, ComparisonType(caseInsensitive)));
         }
 
-        public static IEnumerable<DiscoveredType> InvertFilterBySourceAssembly(this IEnumerable<DiscoveredType> discoveredTypes,
+        public static IEnumerable<DiscoveredType> InvertFilterBySourceAssembly(
+            this IEnumerable<DiscoveredType> discoveredTypes,
             string filter, bool caseInsensitive = true)
         {
             return discoveredTypes
@@ -31,7 +34,8 @@ namespace CodeToData.Domain.Extensions
                     !discoveredType.SourceAssembly.Contains(filter, ComparisonType(caseInsensitive)));
         }
 
-        public static IEnumerable<DiscoveredType> InvertFilterBySourceNamespace(this IEnumerable<DiscoveredType> discoveredTypes,
+        public static IEnumerable<DiscoveredType> InvertFilterBySourceNamespace(
+            this IEnumerable<DiscoveredType> discoveredTypes,
             string filter, bool caseInsensitive = true)
         {
             return discoveredTypes

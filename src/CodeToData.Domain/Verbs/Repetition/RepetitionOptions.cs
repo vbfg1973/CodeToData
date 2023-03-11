@@ -1,5 +1,4 @@
-﻿using System.Collections.Concurrent;
-using CommandLine;
+﻿using CommandLine;
 
 namespace CodeToData.Domain.Verbs.Repetition
 {

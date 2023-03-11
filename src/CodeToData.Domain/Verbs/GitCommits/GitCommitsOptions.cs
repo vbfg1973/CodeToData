@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using CommandLine;
+﻿using CommandLine;
 
 namespace CodeToData.Domain.Verbs.GitCommits
 {

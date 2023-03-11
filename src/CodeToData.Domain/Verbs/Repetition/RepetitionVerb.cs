@@ -7,8 +7,6 @@ using CodeToData.Domain.Models;
 using CodeToData.Domain.Services.CodeAnalysis;
 using CodeToData.Domain.Visitors.Syntax.Repetition;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.Extensions.Logging;
 
 namespace CodeToData.Domain.Verbs.Repetition
@@ -32,17 +30,12 @@ namespace CodeToData.Domain.Verbs.Repetition
             await ScanProjects(compiler);
 
             foreach (var key in _dictionary.Keys)
-            {
                 if (_dictionary[key].Count == 1)
-                {
                     _dictionary.Remove(key);
-                }
 
                 else
-                {
-                    await Console.Error.WriteLineAsync($"Count={_dictionary[key].Count}\tHashCode={key}\tDescendantCount={_dictionary[key].First().Descendants}");
-                }
-            }
+                    await Console.Error.WriteLineAsync(
+                        $"Count={_dictionary[key].Count}\tHashCode={key}\tDescendantCount={_dictionary[key].First().Descendants}");
 
             var list = _dictionary
                 .Values
@@ -52,7 +45,7 @@ namespace CodeToData.Domain.Verbs.Repetition
             foreach (var set in list)
             {
                 Console.Error.WriteLine(set.Count);
-                Console.WriteLine(JsonSerializer.Serialize(set, new JsonSerializerOptions()
+                Console.WriteLine(JsonSerializer.Serialize(set, new JsonSerializerOptions
                 {
                     WriteIndented = true
                 }));
@@ -69,7 +62,6 @@ namespace CodeToData.Domain.Verbs.Repetition
                 await Console.Error.WriteLineAsync($"Examining {project.Name} - {projectCompilation.Language}");
 
                 foreach (var doc in docs)
-                {
                     switch (projectCompilation.Language)
                     {
                         case "C#":
@@ -82,7 +74,6 @@ namespace CodeToData.Domain.Verbs.Repetition
 
                         default: throw new ArgumentException("Unknown language");
                     }
-                }
             }
         }
 
@@ -92,10 +83,7 @@ namespace CodeToData.Domain.Verbs.Repetition
 
             foreach (var c in walker.CodeSignatures)
             {
-                if (!_dictionary.ContainsKey(c.Signature))
-                {
-                    _dictionary[c.Signature] = new HashSet<CodeSignature>();
-                }
+                if (!_dictionary.ContainsKey(c.Signature)) _dictionary[c.Signature] = new HashSet<CodeSignature>();
 
                 _dictionary[c.Signature].Add(c);
             }

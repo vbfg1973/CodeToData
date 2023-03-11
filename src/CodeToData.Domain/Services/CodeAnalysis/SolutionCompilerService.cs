@@ -55,18 +55,13 @@ namespace CodeToData.Domain.Services.CodeAnalysis
                 await Console.Error.WriteLineAsync($"Building: {project.Name}");
                 var compilation = await project.GetCompilationAsync();
 
-                if (compilation == null)
-                {
-                    continue;
-                }
+                if (compilation == null) continue;
 
                 var symbolWalker = new NamedTypeDiscoveryVisitor();
                 symbolWalker.Visit(compilation.GlobalNamespace);
 
                 foreach (var symbol in symbolWalker.Symbols)
-                {
                     _symbols[$"{symbol.ContainingAssembly.Name}_{symbol.Name}"] = symbol;
-                }
 
                 _compilations[project.Name] = compilation;
                 _projects[project.Name] = project;

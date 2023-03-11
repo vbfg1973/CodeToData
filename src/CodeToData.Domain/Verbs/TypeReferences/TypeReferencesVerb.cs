@@ -36,7 +36,6 @@ namespace CodeToData.Domain.Verbs.TypeReferences
                 await Console.Error.WriteLineAsync($"Examining {project.Name} - {projectCompilation.Language}");
 
                 foreach (var doc in docs)
-                {
                     switch (projectCompilation.Language)
                     {
                         case "C#":
@@ -51,7 +50,6 @@ namespace CodeToData.Domain.Verbs.TypeReferences
 
                         default: throw new ArgumentException("Unknown language");
                     }
-                }
             }
 
             await Utilities.SaveCsvAsync(options.OutputCsv, types);
@@ -61,29 +59,16 @@ namespace CodeToData.Domain.Verbs.TypeReferences
             TypeReferencesOptions options)
         {
             if (!string.IsNullOrEmpty(options.SourceAssemblyFilter))
-            {
                 types = types.FilterBySourceAssembly(options.SourceAssemblyFilter, options.CaseInsensitive);
-            }
 
             if (!string.IsNullOrEmpty(options.SourceNamespaceFilter))
-            {
                 types = types.FilterBySourceNamespace(options.SourceNamespaceFilter, options.CaseInsensitive);
-            }
 
-            if (!options.GlobalNamespace)
-            {
-                types = types.InvertFilterBySourceNamespace("global namespace");
-            }
+            if (!options.GlobalNamespace) types = types.InvertFilterBySourceNamespace("global namespace");
 
-            if (!options.MSCorlib)
-            {
-                types = types.InvertFilterBySourceAssembly("mscorlib");
-            }
+            if (!options.MSCorlib) types = types.InvertFilterBySourceAssembly("mscorlib");
 
-            if (!options.MSCorlib)
-            {
-                types = types.InvertFilterBySourceAssembly("netstandard");
-            }
+            if (!options.MSCorlib) types = types.InvertFilterBySourceAssembly("netstandard");
 
             return types;
         }

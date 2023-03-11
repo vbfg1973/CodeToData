@@ -2,123 +2,127 @@
 using CodeToData.Domain.Models;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace CodeToData.Domain.Visitors.Syntax;
-
-public class CSharpTypeDiscoveryWalker : CSharpSyntaxWalker
+namespace CodeToData.Domain.Visitors.Syntax
 {
-    private readonly Document _document;
-    private readonly SemanticModel _model;
-    private readonly SyntaxTree _tree;
-
-    public CSharpTypeDiscoveryWalker(Compilation compilation, Document document)
+    public class CSharpTypeDiscoveryWalker : CSharpSyntaxWalker
     {
-        _document = document;
-        _tree = document.GetSyntaxTreeAsync().Result;
-        _model = compilation.GetSemanticModel(_tree);
-        Types = new List<DiscoveredType>();
-        Visit();
-    }
+        private readonly Document _document;
+        private readonly SemanticModel _model;
+        private readonly SyntaxTree _tree;
 
-    public List<DiscoveredType> Types { get; set; }
-
-    private void Visit()
-    {
-        Visit(_tree.GetRoot());
-    }
-
-    public override void Visit(SyntaxNode? node)
-    {
-        Types.AddRange(IdentifyType(node));
-
-        base.Visit(node);
-    }
-
-    private IEnumerable<DiscoveredType> IdentifyType(SyntaxNode node)
-    {
-        var identifiedType = _model.GetTypeInfo(node);
-        var convertedType = identifiedType.ConvertedType;
-
-        if (convertedType is not { SpecialType: SpecialType.None }) yield break;
-
-        var assembly = GetAssembly(convertedType);
-        var ns = GetNameSpace(convertedType);
-
-        if (string.IsNullOrEmpty(assembly) || string.IsNullOrEmpty(ns)) yield break;
-
-        yield return new DiscoveredType
+        public CSharpTypeDiscoveryWalker(Compilation compilation, Document document)
         {
-            Name = convertedType.Name,
-            SourceAssembly = assembly,
-            SourceNamespace = ns,
-            TypeKind = convertedType.TypeKind.ToString(),
-            DocumentName = _document.FilePath,
-            AssemblyName = _document.Project.AssemblyName,
-            StartPosition = node.Span.Start,
-            EndPosition = node.Span.End
-        };
-    }
-    
-    private IEnumerable<DiscoveredType> DiscoveredType(SyntaxNode node)
-    {
-        var symbolInfo = _model.GetSymbolInfo(node);
-        var identifiedType = _model.GetTypeInfo(node);
-        var convertedType = identifiedType.ConvertedType;
-
-        if (convertedType is not { SpecialType: SpecialType.None }) yield break;
-        string assembly = string.Empty;
-        string ns = string.Empty;
-
-        try
-        {
-            assembly = GetAssembly(symbolInfo.Symbol);
-            ns = GetNameSpace(symbolInfo.Symbol);
+            _document = document;
+            _tree = document.GetSyntaxTreeAsync().Result;
+            _model = compilation.GetSemanticModel(_tree);
+            Types = new List<DiscoveredType>();
+            Visit();
         }
 
-        catch
+        public List<DiscoveredType> Types { get; set; }
+
+        private void Visit()
         {
-            //
+            Visit(_tree.GetRoot());
         }
 
-        if (string.IsNullOrEmpty(assembly) || string.IsNullOrEmpty(ns)) yield break;
-
-        yield return new DiscoveredType
+        public override void Visit(SyntaxNode? node)
         {
-            Name = convertedType.Name,
-            SourceAssembly = assembly,
-            SourceNamespace = ns,
-            TypeKind = convertedType.TypeKind.ToString(),
-            DocumentName = _document.FilePath,
-            AssemblyName = _document.Project.AssemblyName,
-            StartPosition = node.Span.Start,
-            EndPosition = node.Span.End
-        };
-    }
+            Types.AddRange(IdentifyType(node));
 
-    private string GetNameSpace(ITypeSymbol typeSymbol)
-    {
-        return typeSymbol.ContainingNamespace != null ? typeSymbol.ContainingNamespace.ToDisplayString() : string.Empty;
-    }
-    
-    private string GetNameSpace(ISymbol typeSymbol)
-    {
-        return typeSymbol.ContainingNamespace != null ? typeSymbol.ContainingNamespace.ToDisplayString() : string.Empty;
-    }
+            base.Visit(node);
+        }
 
-    private string GetAssembly(ITypeSymbol typeSymbol)
-    {
-        return typeSymbol.ContainingAssembly != null ? typeSymbol.ContainingAssembly.Name : string.Empty;
-    }
-    
-    private string GetAssembly(ISymbol typeSymbol)
-    {
-        return typeSymbol.ContainingAssembly != null ? typeSymbol.ContainingAssembly.Name : string.Empty;
-    }
+        private IEnumerable<DiscoveredType> IdentifyType(SyntaxNode node)
+        {
+            var identifiedType = _model.GetTypeInfo(node);
+            var convertedType = identifiedType.ConvertedType;
 
-    private string NodeToString(SyntaxNode node)
-    {
-        var str = node.ToFullString();
-        return str.Length > 40 ? "TOO LONG" : str.ReplaceLineEndings("\t");
+            if (convertedType is not { SpecialType: SpecialType.None }) yield break;
+
+            var assembly = GetAssembly(convertedType);
+            var ns = GetNameSpace(convertedType);
+
+            if (string.IsNullOrEmpty(assembly) || string.IsNullOrEmpty(ns)) yield break;
+
+            yield return new DiscoveredType
+            {
+                Name = convertedType.Name,
+                SourceAssembly = assembly,
+                SourceNamespace = ns,
+                TypeKind = convertedType.TypeKind.ToString(),
+                DocumentName = _document.FilePath,
+                AssemblyName = _document.Project.AssemblyName,
+                StartPosition = node.Span.Start,
+                EndPosition = node.Span.End
+            };
+        }
+
+        private IEnumerable<DiscoveredType> DiscoveredType(SyntaxNode node)
+        {
+            var symbolInfo = _model.GetSymbolInfo(node);
+            var identifiedType = _model.GetTypeInfo(node);
+            var convertedType = identifiedType.ConvertedType;
+
+            if (convertedType is not { SpecialType: SpecialType.None }) yield break;
+            var assembly = string.Empty;
+            var ns = string.Empty;
+
+            try
+            {
+                assembly = GetAssembly(symbolInfo.Symbol);
+                ns = GetNameSpace(symbolInfo.Symbol);
+            }
+
+            catch
+            {
+                //
+            }
+
+            if (string.IsNullOrEmpty(assembly) || string.IsNullOrEmpty(ns)) yield break;
+
+            yield return new DiscoveredType
+            {
+                Name = convertedType.Name,
+                SourceAssembly = assembly,
+                SourceNamespace = ns,
+                TypeKind = convertedType.TypeKind.ToString(),
+                DocumentName = _document.FilePath,
+                AssemblyName = _document.Project.AssemblyName,
+                StartPosition = node.Span.Start,
+                EndPosition = node.Span.End
+            };
+        }
+
+        private string GetNameSpace(ITypeSymbol typeSymbol)
+        {
+            return typeSymbol.ContainingNamespace != null
+                ? typeSymbol.ContainingNamespace.ToDisplayString()
+                : string.Empty;
+        }
+
+        private string GetNameSpace(ISymbol typeSymbol)
+        {
+            return typeSymbol.ContainingNamespace != null
+                ? typeSymbol.ContainingNamespace.ToDisplayString()
+                : string.Empty;
+        }
+
+        private string GetAssembly(ITypeSymbol typeSymbol)
+        {
+            return typeSymbol.ContainingAssembly != null ? typeSymbol.ContainingAssembly.Name : string.Empty;
+        }
+
+        private string GetAssembly(ISymbol typeSymbol)
+        {
+            return typeSymbol.ContainingAssembly != null ? typeSymbol.ContainingAssembly.Name : string.Empty;
+        }
+
+        private string NodeToString(SyntaxNode node)
+        {
+            var str = node.ToFullString();
+            return str.Length > 40 ? "TOO LONG" : str.ReplaceLineEndings("\t");
+        }
     }
 }

@@ -16,10 +16,12 @@ namespace CodeToData.Domain.Verbs.TypeReferences
         [Option('i', "caseInsensitive", Default = true, HelpText = "Toggles case insensitivity of filters")]
         public bool CaseInsensitive { get; set; }
 
-        [Option('g', "globalNamespace", Default = false, HelpText = "Ignores types from global namespace unless turned on")]
+        [Option('g', "globalNamespace", Default = false,
+            HelpText = "Ignores types from global namespace unless turned on")]
         public bool GlobalNamespace { get; set; }
 
-        [Option('m', "mscorlib", Default = false, HelpText = "Ignores types from mscorlib assembly (Guids, IEnumerable, et al) unless turned on")]
+        [Option('m', "mscorlib", Default = false,
+            HelpText = "Ignores types from mscorlib assembly (Guids, IEnumerable, et al) unless turned on")]
         public bool MSCorlib { get; set; }
 
         [Option('n', "netstandard", Default = false, HelpText = "Ignores types from netstandard assembly")]

@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using CodeToData.Domain.Extensions;
 using CodeToData.Domain.Models;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -16,29 +15,23 @@ namespace CodeToData.Domain.Visitors.Syntax.Repetition
         private readonly SemanticModel _model;
         private readonly SyntaxTree _tree;
 
-        public List<CodeSignature> CodeSignatures { get; } = new List<CodeSignature>();
-
-        private bool IsValid => _compilation != null &&
-                                _document != null &&
-                                _model != null &&
-                                _tree != null;
-
         public CSharpCodeDiscoveryWalker(Compilation compilation, Document document)
         {
             _compilation = compilation;
             _document = document;
             _tree = document.GetSyntaxTreeAsync().Result;
 
-            if (_tree != null)
-            {
-                _model = compilation.GetSemanticModel(_tree);
-            }
+            if (_tree != null) _model = compilation.GetSemanticModel(_tree);
 
-            if (IsValid)
-            {
-                Visit();
-            }
+            if (IsValid) Visit();
         }
+
+        public List<CodeSignature> CodeSignatures { get; } = new();
+
+        private bool IsValid => _compilation != null &&
+                                _document != null &&
+                                _model != null &&
+                                _tree != null;
 
         private void Visit()
         {
@@ -63,7 +56,8 @@ namespace CodeToData.Domain.Visitors.Syntax.Repetition
                 .Select(childNode => childNode.Kind().ToString()));
 
             var text = await document.GetTextAsync();
-            var codeSnippet = text.ToString().Substring(syntaxNode.Span.Start, syntaxNode.Span.End - syntaxNode.Span.Start);
+            var codeSnippet = text.ToString()
+                .Substring(syntaxNode.Span.Start, syntaxNode.Span.End - syntaxNode.Span.Start);
 
             return new CodeSignature
             {

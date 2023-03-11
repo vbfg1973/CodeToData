@@ -26,10 +26,7 @@ namespace CodeToData.Domain.Visitors.Semantics
 
         public override void VisitNamespace(INamespaceSymbol symbol)
         {
-            foreach (var childSymbol in symbol.GetMembers())
-            {
-                childSymbol.Accept(this);
-            }
+            foreach (var childSymbol in symbol.GetMembers()) childSymbol.Accept(this);
 
             base.VisitNamespace(symbol);
         }
@@ -40,10 +37,7 @@ namespace CodeToData.Domain.Visitors.Semantics
 
             _symbols[type] = symbol;
 
-            foreach (var childSymbol in symbol.GetTypeMembers())
-            {
-                childSymbol.Accept(this);
-            }
+            foreach (var childSymbol in symbol.GetTypeMembers()) childSymbol.Accept(this);
 
             Parallel.ForEach(symbol.GetTypeMembers(), s => s.Accept(this));
 

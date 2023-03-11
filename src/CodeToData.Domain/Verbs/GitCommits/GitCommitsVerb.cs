@@ -9,20 +9,13 @@ namespace CodeToData.Domain.Verbs.GitCommits
 {
     public class GitCommitsVerb
     {
-        public GitCommitsVerb()
-        {
-        }
-
         public async Task Run(GitCommitsOptions options)
         {
             var repo = new Repository(options.Repository);
 
             var commitEntries = new List<GitCommitEntry>();
-            
-            foreach (var commit in repo.Commits)
-            {
-                commitEntries.AddRange(commit.CommitEntries(repo));
-            }
+
+            foreach (var commit in repo.Commits) commitEntries.AddRange(commit.CommitEntries(repo));
 
             await Utilities.SaveCsvAsync(options.OutputCsv, commitEntries);
             await Console.Error.WriteLineAsync($"Wrote {commitEntries.Count} commits");

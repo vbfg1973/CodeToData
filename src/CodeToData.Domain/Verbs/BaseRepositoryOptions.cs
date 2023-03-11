@@ -6,7 +6,7 @@ namespace CodeToData.Domain.Verbs
     {
         [Option('r', "repository", Required = true, HelpText = "Path to repo")]
         public string Repository { get; set; }
-        
+
         [Option('o', "output", Required = true, HelpText = "Path to output csv")]
         public string OutputCsv { get; set; }
     }

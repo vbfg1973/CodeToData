@@ -39,18 +39,12 @@ namespace CodeToData.Domain.Visitors.Syntax
             var identifiedType = _model.GetTypeInfo(node);
             var convertedType = identifiedType.ConvertedType;
 
-            if (convertedType is not { SpecialType: SpecialType.None })
-            {
-                yield break;
-            }
+            if (convertedType is not { SpecialType: SpecialType.None }) yield break;
 
             var assembly = GetAssembly(convertedType);
             var ns = GetNameSpace(convertedType);
 
-            if (string.IsNullOrEmpty(assembly) || string.IsNullOrEmpty(ns))
-            {
-                yield break;
-            }
+            if (string.IsNullOrEmpty(assembly) || string.IsNullOrEmpty(ns)) yield break;
 
             yield return new DiscoveredType
             {
@@ -71,10 +65,7 @@ namespace CodeToData.Domain.Visitors.Syntax
             var identifiedType = _model.GetTypeInfo(node);
             var convertedType = identifiedType.ConvertedType;
 
-            if (convertedType is not { SpecialType: SpecialType.None })
-            {
-                yield break;
-            }
+            if (convertedType is not { SpecialType: SpecialType.None }) yield break;
 
             var assembly = string.Empty;
             var ns = string.Empty;
@@ -90,10 +81,7 @@ namespace CodeToData.Domain.Visitors.Syntax
                 //
             }
 
-            if (string.IsNullOrEmpty(assembly) || string.IsNullOrEmpty(ns))
-            {
-                yield break;
-            }
+            if (string.IsNullOrEmpty(assembly) || string.IsNullOrEmpty(ns)) yield break;
 
             yield return new DiscoveredType
             {
@@ -110,12 +98,16 @@ namespace CodeToData.Domain.Visitors.Syntax
 
         private string GetNameSpace(ITypeSymbol typeSymbol)
         {
-            return typeSymbol.ContainingNamespace != null ? typeSymbol.ContainingNamespace.ToDisplayString() : string.Empty;
+            return typeSymbol.ContainingNamespace != null
+                ? typeSymbol.ContainingNamespace.ToDisplayString()
+                : string.Empty;
         }
 
         private string GetNameSpace(ISymbol typeSymbol)
         {
-            return typeSymbol.ContainingNamespace != null ? typeSymbol.ContainingNamespace.ToDisplayString() : string.Empty;
+            return typeSymbol.ContainingNamespace != null
+                ? typeSymbol.ContainingNamespace.ToDisplayString()
+                : string.Empty;
         }
 
         private string GetAssembly(ITypeSymbol typeSymbol)

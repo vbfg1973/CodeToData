@@ -28,7 +28,6 @@ namespace CodeToData.Domain.Verbs.Definitions
                 await Console.Error.WriteLineAsync($"Examining {project.Name} - {projectCompilation.Language}");
 
                 foreach (var doc in docs)
-                {
                     switch (projectCompilation.Language)
                     {
                         case "C#":
@@ -43,7 +42,6 @@ namespace CodeToData.Domain.Verbs.Definitions
 
                         default: throw new ArgumentException("Unknown language");
                     }
-                }
             }
 
             await Utilities.SaveCsvAsync(options.OutputCsv, definitions);
