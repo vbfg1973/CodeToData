@@ -27,34 +27,41 @@ Build it, run the executable or ```dotnet exec <path_to_dll> verb -s <solution_f
 
 ## Usages:
 
-### list
+### definitions
 
-    CodeToData list -s <solution_file_path> -o <output_csv> -n <optional_namespace_filter>
+    CodeToData definitions -s <solution_file_path> -o <output_csv>
 
-This lists every type available to the solution whether used or not.
+Lists all class definitions in the code. I only added this so that any analysis about the files themselves, for example through git, will give an idea of which types we're talking about when talking about a file.
 
-The namespace filter is a simple case insensitive filter.
+### references
 
-#### Output schema:
+    CodeToData references -s <solution_file_path> -o <output_csv>
 
-* SymbolName - Name of the discovered type
-* ContainingAssembly - Source assembly of the discovered type
-* ContainingNamespace - Containing namespace of the discovered type
-* TypeKind - The symbol type (Class, Interface, Enum, Record, Struct, Delegate)
+Walks the ASTs looking for definitions of types contained within the solution. It will then walk the semantic model looking for references to those types and enumerating them with context into the output CSV.
 
-### find
+### repetition
 
-    CodeToData find -s <solution_file_path> -o <output_csv> -n <optional_namespace_filter>
+    CodeToData references -s <solution_file_path> -o s > output.json
 
-More usefully, discovers every type available to the project and lists the usages.
+__Note that the command line is slightly different. Not entirely sure what I want the output of this to look like atm so for now it's dumping a series of JSON arrays, one for each pattern family. The patterns with the largest number of descendants are at the top of the output best captured atm by redirecting to a file.__
 
-#### Output schema:
+__Best way to use this at present is open the output in notepad++ and search for the filenames you're presently interested in. Features for filtering on this and other bases are coming soon.__
 
-* SymbolName - Name of the discovered type
-* ContainingAssembly - Source assembly of the discovered type
-* ContainingNamespace - Containing namespace of the discovered type
-* TypeKind - The symbol type (Class, Interface, Enum, Record, Struct, Delegate)
-* Project - The Project in the solution where the usage was found
-* Document - The full path to the file where found
-* StartPosition - Number of characters from the beginning of the file
-* EndPosition - Number of characters from the beginning of the file
+Walks the ASTs in the solution building textual descriptions of the subtree from each node. From this 'signature' somewhat reliable detection of repeating patterns in the code can be used. 
+
+It finds too much. It finds things which appear not to be similar and may not be, but just happen to have a similar structure. However, if you know where your problem areas are likely to be found then it can be useful.
+
+The key to finding your problem areas are: 
+
+1) Find the most complex files by your favourite measure of complexity (cyclomatic or GTFO).
+2) Those complex files which change often, as measurable with git.
+
+Files which appear near the top of both lists are your high value targets. These are the files which are:
+
+* difficult to read for a developer new to the project
+* in need of remediation, hence all the activity
+* in the most danger of bugs being introduced
+
+The most profit exists in breaking these out into digestible chunks and removal of any and all repetition.
+
+Look also for those files that often change at the same time. Architectural smells abound and you may need to figure these into refactoring plans devised from these methods.
