@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using CodeToData.Domain.Verbs.Definitions;
+using CodeToData.Domain.Verbs.GitCommits;
 using CodeToData.Domain.Verbs.Repetition;
 using CodeToData.Domain.Verbs.TypeReferences;
 using CommandLine;
@@ -42,6 +43,7 @@ internal static class Program
             .AddTransient<TypeReferencesVerb>()
             .AddTransient<DefinitionsVerb>()
             .AddTransient<RepetitionVerb>()
+            .AddTransient<GitCommitsVerb>()
             ;
 
         #endregion
@@ -78,7 +80,13 @@ internal static class Program
         ConfigureServices();
 
         Parser.Default
-            .ParseArguments<DefinitionsOptions, TypeReferencesOptions, RepetitionOptions>(args)
+            .ParseArguments<
+                DefinitionsOptions, 
+                TypeReferencesOptions, 
+                RepetitionOptions,
+                
+                GitCommitsOptions
+            >(args)
             .WithParsed<TypeReferencesOptions>(options =>
             {
                 var verb = s_serviceProvider.GetService<TypeReferencesVerb>();
@@ -92,6 +100,11 @@ internal static class Program
             .WithParsed<RepetitionOptions>(options =>
             {
                 var verb = s_serviceProvider.GetService<RepetitionVerb>();
+                verb?.Run(options).Wait();
+            })
+            .WithParsed<GitCommitsOptions>(options =>
+            {
+                var verb = s_serviceProvider.GetService<GitCommitsVerb>();
                 verb?.Run(options).Wait();
             })
             ;
