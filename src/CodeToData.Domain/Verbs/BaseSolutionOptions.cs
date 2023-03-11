@@ -10,4 +10,10 @@ namespace CodeToData.Domain.Verbs
         [Option('o', "output", Required = true, HelpText = "Path to output csv")]
         public string OutputCsv { get; set; }
     }
+    
+    public abstract class BaseRepositoryOptions
+    {
+        [Option('r', "repository", Required = true, HelpText = "Path to repo")]
+        public string Repository { get; set; }
+    }
 }
