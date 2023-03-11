@@ -65,3 +65,9 @@ Files which appear near the top of both lists are your high value targets. These
 The most profit exists in breaking these out into digestible chunks and removal of any and all repetition.
 
 Look also for those files that often change at the same time. Architectural smells abound and you may need to figure these into refactoring plans devised from these methods.
+
+### commits
+
+    CodeToData commits -r <repository_path> -o <output.csv>
+
+Lists files changed by a commit
