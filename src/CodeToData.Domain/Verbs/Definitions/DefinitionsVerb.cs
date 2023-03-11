@@ -14,9 +14,9 @@ namespace CodeToData.Domain.Verbs.Definitions
     {
         public async Task Run(DefinitionsOptions options)
         {
-            await Console.Error.WriteLineAsync(
-                $"Compiling {options.Solution} for definitions");
-            var compiler = new SolutionCompilerService(options.Solution);
+                await Console.Error.WriteLineAsync(
+                    $"Compiling {options.Solution} for definitions");
+                var compiler = new SolutionCompilerService(options.Solution);
 
             var definitions = new List<TypeDefinition>();
 

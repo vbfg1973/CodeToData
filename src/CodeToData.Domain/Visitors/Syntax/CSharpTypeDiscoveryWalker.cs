@@ -2,6 +2,7 @@
 using CodeToData.Domain.Models;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.Text;
 
 namespace CodeToData.Domain.Visitors.Syntax
 {

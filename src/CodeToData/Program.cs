@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using CodeToData.Domain.Verbs.ClassMeta;
 using CodeToData.Domain.Verbs.Definitions;
 using CodeToData.Domain.Verbs.GitCommits;
 using CodeToData.Domain.Verbs.Repetition;
@@ -44,6 +45,7 @@ namespace CodeToData
                 .AddTransient<DefinitionsVerb>()
                 .AddTransient<RepetitionVerb>()
                 .AddTransient<GitCommitsVerb>()
+                .AddTransient<ClassMetaVerb>()
                 ;
 
             #endregion
@@ -84,7 +86,8 @@ namespace CodeToData
                     DefinitionsOptions,
                     TypeReferencesOptions,
                     RepetitionOptions,
-                    GitCommitsOptions
+                    GitCommitsOptions,
+                    ClassMetaOptions
                 >(args)
                 .WithParsed<TypeReferencesOptions>(options =>
                 {
@@ -104,6 +107,12 @@ namespace CodeToData
                 .WithParsed<GitCommitsOptions>(options =>
                 {
                     var verb = s_serviceProvider.GetService<GitCommitsVerb>();
+                    verb?.Run(options).Wait();
+                })
+                
+                .WithParsed<ClassMetaOptions>(options =>
+                {
+                    var verb = s_serviceProvider.GetService<ClassMetaVerb>();
                     verb?.Run(options).Wait();
                 })
                 ;
